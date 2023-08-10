@@ -2,6 +2,7 @@
 -- computes and store the average weighted score for all students.
 DELIMITER //
 BEGIN
+CREATE PROCEDURE ComputeAverageWeightedScoreForUsers()
 -- Calculate average score and update record in users table
 UPDATE users
 SET average_score = (
