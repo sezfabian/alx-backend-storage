@@ -4,7 +4,7 @@ Writing strings to Redis Module
 """
 import redis
 import uuid
-from typing import Union, Callable
+from typing import Union, Callable, Any
 
 class Cache:
     """
@@ -28,7 +28,7 @@ class Cache:
 
         return key
 
-    def get(self, key: str, fn: Callable = None) -> Union[str, bytes, int, float, list]:
+    def get(self, key: str, fn: Callable = None) -> Any:
         """
         Reading from Redis and recovering original type
         """
@@ -53,3 +53,4 @@ class Cache:
         Converts byte string to integers
         """
         return int(data)
+
