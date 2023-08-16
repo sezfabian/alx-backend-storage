@@ -7,6 +7,34 @@ import uuid
 from typing import Union, Optional, Callable, Any
 from functools import wraps
 
+
+def count_calls(method: Callable) -> Callable:
+    """ Decorator for Cache class methods to track call count
+    """
+    @wraps(method)
+    def wrapper(self: Any, *args, **kwargs) -> str:
+        """ Wraps called method and adds its call count redis before execution
+        """
+        self._redis.incr(method.__qualname__)
+        return method(self, *args, **kwargs)
+    return wrapper
+
+
+def call_history(method: Callable) -> Callable:
+    """ Decorator for Cache class method to track args
+    """
+    @wraps(method)
+    def wrapper(self: Any, *args) -> str:
+        """ Wraps called method and tracks its passed argument by storing
+            them to redis
+        """
+        self._redis.rpush(f'{method.__qualname__}:inputs', str(args))
+        output = method(self, *args)
+        self._redis.rpush(f'{method.__qualname__}:outputs', output)
+        return output
+    return wrapper
+
+
 class Cache:
     """
     Create a Cache class
@@ -55,28 +83,3 @@ class Cache:
         """
         return int(data)
 
-def count_calls(method: Callable) -> Callable:
-    """ Decorator for Cache class methods to track call count
-    """
-    @wraps(method)
-    def wrapper(self: Any, *args, **kwargs) -> str:
-        """ Wraps called method and adds its call count redis before execution
-        """
-        self._redis.incr(method.__qualname__)
-        return method(self, *args, **kwargs)
-    return wrapper
-
-
-def call_history(method: Callable) -> Callable:
-    """ Decorator for Cache class method to track args
-    """
-    @wraps(method)
-    def wrapper(self: Any, *args) -> str:
-        """ Wraps called method and tracks its passed argument by storing
-            them to redis
-        """
-        self._redis.rpush(f'{method.__qualname__}:inputs', str(args))
-        output = method(self, *args)
-        self._redis.rpush(f'{method.__qualname__}:outputs', output)
-        return output
-    return wrapper
