@@ -31,7 +31,10 @@ def log_stats(logs: MongoClient):
 
     ip_counts = log_ips(logs)
     print("IPs:")
-    for i in range(10):
+    count = len(ip_counts)
+    if count > 10:
+        count = 10
+    for i in range(count):
         print("\t{}: {}".format(ip_counts[i].get('_id'),
                                 ip_counts[i].get('count')))
 
